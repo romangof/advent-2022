@@ -1,5 +1,25 @@
 {
-  "dependencies": {
-    "@types/node": "^18.11.10"
+  "name": "aoc2022",
+  "version": "1.0.0",
+  "description": "Advent of Code 2022 - solutions",
+  "type": "module",
+  "scripts": {
+    "start": "aocrunner day",
+    "build": "aocrunner build",
+    "format": "prettier -w src"
+  },
+  "keywords": [
+    "aoc"
+  ],
+  "author": "Roman",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^16.11.6",
+    "aocrunner": "^1.8.1",
+    "prettier": "^2.8.0"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=16.13.0"
   }
 }
