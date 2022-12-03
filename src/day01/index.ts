@@ -30,7 +30,7 @@ const part2 = (rawInput: string) => {
   const res = parseInput(rawInput)
   .map(line => line.split('\n'))
   .map(sum => sum.reduce((accum, current) => Number(accum)+Number(current), 0))
-  .sort().reverse()
+  .sort((a, b) => b-a)  
 
   return res[0] + res[1] + res[2]
 }
@@ -55,5 +55,5 @@ run({
     solution: part2,
   },
   trimTestInputs: true,
-  onlyTests: false,
+  onlyTests: true,
 })
