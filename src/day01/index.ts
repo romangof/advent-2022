@@ -19,18 +19,22 @@ const parseInput = (rawInput: string) => rawInput.split("\n\n")
 
 const part1 = (rawInput: string) => {
   const res = parseInput(rawInput)
-  .map(line => line.split('\n'))
-  .map(sum => sum.reduce((accum, current) => Number(accum)+Number(current), 0))
+    .map((line) => line.split("\n"))
+    .map((sum) =>
+      sum.reduce((accum, current) => Number(accum) + Number(current), 0),
+    )
 
   return Math.max(...res)
 }
 
 const part2 = (rawInput: string) => {
-
   const res = parseInput(rawInput)
-  .map(line => line.split('\n'))
-  .map(sum => sum.reduce((accum, current) => Number(accum)+Number(current), 0))
-  .sort((a, b) => b-a)  
+    .map((line) => line.split("\n"))
+    .map((sum) =>
+      sum.reduce((accum, current) => Number(accum) + Number(current), 0),
+    )
+
+    .sort((a, b) => b - a)
 
   return res[0] + res[1] + res[2]
 }
