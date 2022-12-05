@@ -24,30 +24,22 @@ const part1 = (rawInput: string) => {
         .map((char) => String.fromCharCode(char)),
     )
 
-  const priority = (x: string) => alphabet.indexOf(x)
+  const priority = (x: string) => alphabet.indexOf(x) + 1
 
-  // console.log(alphabet.indexOf("Z") + 1)
-
-  // console.log(Array.from(input[0][0]))
-
-  const res = input.map((sacks) => {
-    // console.log(1111, sacks, Array.from(sacks[1]))
-
-    const repeated = Array.from(sacks[0]).reduce(
-      (accum, current) => (sacks[1].includes(current) ? current : accum),
-      "",
+  const res = input
+    .map((sacks) =>
+      Array.from(sacks[0]).reduce(
+        (accum, current) => (sacks[1].includes(current) ? current : accum),
+        "",
+      ),
     )
+    .reduce((accum, current) => {
+      console.log(priority(current))
 
-    console.log(3333, repeated)
+      return accum + priority(current)
+    }, 0)
 
-    return repeated
-  })
-
-  console.log(2222, res)
-
-  // console.log(input)
-
-  return
+  return res
 }
 
 const part2 = (rawInput: string) => {
@@ -76,5 +68,5 @@ run({
     solution: part2,
   },
   trimTestInputs: true,
-  onlyTests: true,
+  onlyTests: false,
 })
