@@ -40,14 +40,10 @@ const part2 = (rawInput: string) => {
     const lastStart = Number(current[2])
     const lastEnd = Number(current[3])
 
-    if (
-      (firstStart < lastStart && firstEnd < lastStart) ||
+    return (firstStart < lastStart && firstEnd < lastStart) ||
       (firstStart > lastEnd && firstEnd > lastEnd)
-    ) {
-      return accumulator
-    }
-
-    return ++accumulator
+      ? accumulator
+      : ++accumulator
   }, 0)
 }
 
