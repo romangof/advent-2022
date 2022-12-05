@@ -8,15 +8,13 @@ const parseInput = (rawInput: string) => rawInput.split("\n")
 
 const part1 = (rawInput: string) => {
   enum Shapes {
-    A = 1, // piedra
+    A = 1, // Rock
     X = 1,
-    B = 2, // papel
+    B = 2, // Paper
     Y = 2,
-    C = 3, // tijera
+    C = 3, // Scissors
     Z = 3,
   }
-
-  const Shapex = [, "Piedra", "papel", "tijera"]
 
   type Shape = keyof typeof Shapes
 
@@ -24,32 +22,54 @@ const part1 = (rawInput: string) => {
     round.split(" "),
   ) as Shape[][]
 
-  const match = input.reduce((score, round) => {
-    let result = 3 // here
-
+  return input.reduce((score, round) => {
     const myShape = Shapes[round[1]]
     const opponent = Shapes[round[0]]
+    let result = 3
 
     if (myShape !== opponent) {
       result = myShape === opponent + 1 || myShape + 2 === opponent ? 6 : 0
     }
 
-    console.log(
-      `yo: ${Shapex[myShape]} vs ${Shapex[opponent]}, resultado: ${result} + ${
-        Shapes[round[1]]
-      }`,
-    )
-
     return score + myShape + result
   }, 0)
-
-  return match
 }
 
 const part2 = (rawInput: string) => {
-  const input = parseInput(rawInput)
+  enum Shapes {
+    A = 1, // Rock
+    B = 2, // Paper
+    C = 3, // Scissors
+  }
+  const cheatSheet = {
+    lose: "X",
+    draw: "Y",
+    win: "Z",
+  }
 
-  return
+  type Shape = keyof typeof Shapes
+
+  const input = parseInput(rawInput).map((round) =>
+    round.split(" "),
+  ) as Shape[][]
+
+  const match = input.reduce((totalSum, round) => {
+    const opponent = round[0]
+    const cheatCode = round[1]
+
+    let result = 3 + Shapes[opponent]
+
+    if (cheatCode !== cheatSheet.draw) {
+      result =
+        cheatCode === cheatSheet.lose
+          ? Shapes[opponent] - 1 || 3
+          : 6 + (Shapes[opponent] > 2 ? 1 : Shapes[opponent] + 1)
+    }
+
+    return totalSum + result
+  }, 0)
+
+  return match
 }
 
 run({
@@ -66,7 +86,7 @@ run({
     tests: [
       {
         input: sampleInput,
-        expected: "",
+        expected: 12,
       },
     ],
     solution: part2,
