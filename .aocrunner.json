@@ -67,10 +67,12 @@
     },
     {
       "part1": {
-        "solved": false,
-        "result": null,
-        "attempts": [],
-        "time": null
+        "solved": true,
+        "result": "QNNTGTPFN",
+        "attempts": [
+          "QNNTGenFN"
+        ],
+        "time": 0.764318
       },
       "part2": {
         "solved": false,
