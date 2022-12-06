@@ -17,7 +17,7 @@ const part1 = (rawInput: string) => {
   const matrix = inputMap
     .split("\n")
     .map((line) =>
-      Array.from(line.replace(/[\[\]]+/g, " ").replace(/\s{3}/g, ""))
+      Array.from(line.replace(/[\[\]]+/g, " "))
         .slice(0, -1)
         .slice(1),
     )
@@ -28,13 +28,11 @@ const part1 = (rawInput: string) => {
         current[index] ? (box + current[index]).replace(" ", "") : box,
       ),
     )
+    .filter((x) => x != " ")
 
   const instructions = inputInstr.split("\n").map((x) => x.split(" "))
 
-  // console.log(matrix)
-  // console.log(instructions)
-
-  const res = instructions
+  return instructions
     .reduce((matrix, set) => {
       const boxesAmount = Number(set[1])
       const origin = Number(set[3]) - 1
@@ -44,7 +42,6 @@ const part1 = (rawInput: string) => {
         matrix[destination] +
         matrix[origin].slice(-boxesAmount).split("").reverse().join("")
       matrix[origin] = matrix[origin].slice(0, -boxesAmount)
-      // console.log(matrix)
 
       return matrix
     }, matrix)
@@ -53,16 +50,44 @@ const part1 = (rawInput: string) => {
         isNaN(Number(current.slice(-1))) ? accum + current.slice(-1) : accum,
       "",
     )
-
-  // console.log(res)
-
-  return res
 }
 
 const part2 = (rawInput: string) => {
-  const input = parseInput(rawInput)
+  const [inputMap, inputInstr] = parseInput(rawInput)
+  const matrix = inputMap
+    .split("\n")
+    .map((line) =>
+      Array.from(line.replace(/[\[\]]+/g, " "))
+        .slice(0, -1)
+        .slice(1),
+    )
+    .reverse()
+    .reduce((accum, current) =>
+      accum.map((box, index) =>
+        current[index] ? (box + current[index]).replace(" ", "") : box,
+      ),
+    )
+    .filter((x) => x != " ")
 
-  return
+  const instructions = inputInstr.split("\n").map((x) => x.split(" "))
+
+  return instructions
+    .reduce((matrix, set) => {
+      const boxesAmount = Number(set[1])
+      const origin = Number(set[3]) - 1
+      const destination = Number(set[5]) - 1
+
+      matrix[destination] =
+        matrix[destination] + matrix[origin].slice(-boxesAmount)
+      matrix[origin] = matrix[origin].slice(0, -boxesAmount)
+
+      return matrix
+    }, matrix)
+    .reduce(
+      (accum, current) =>
+        isNaN(Number(current.slice(-1))) ? accum + current.slice(-1) : accum,
+      "",
+    )
 }
 
 run({
@@ -79,7 +104,7 @@ run({
     tests: [
       {
         input: sampleInput,
-        expected: "",
+        expected: "MCD",
       },
     ],
     solution: part2,

@@ -72,13 +72,16 @@
         "attempts": [
           "QNNTGenFN"
         ],
-        "time": 0.764318
+        "time": 0.712238
       },
       "part2": {
-        "solved": false,
-        "result": null,
-        "attempts": [],
-        "time": null
+        "solved": true,
+        "result": "GGNPJBTTR",
+        "attempts": [
+          "GGSPJBTTR",
+          "FFTFGNZRR"
+        ],
+        "time": 0.591658
       }
     },
     {
