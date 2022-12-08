@@ -58,20 +58,42 @@ const navigateAndAddFile = (
 }
 
 const navigateAndSumFiles = (
-  sysInfo: Record<string, {}>,
-  stackPos: string[],
-) => {
-  let currentDir = sysInfo
+  sysInfo: Folder,
+  totalSum: number[] = [],
+): number => {
+  // totalSum.length > 0 &&
+  //   (totalSum = [...totalSum, totalSum.reduce((a, b) => a + b)])
+  // console.log(totalSum)
 
-  for (let prop of stackPos) {
-    Array.isArray(currentDir.files)
-      ? (currentDir.files = currentDir.files.reduce((a, b) => a + b))
-      : (currentDir = currentDir && currentDir[prop])
+  let index = 0
+  for (let folder in sysInfo) {
+    if (!sysInfo.hasOwnProperty(folder)) continue
 
-    console.log("xxx", currentDir.files)
+    console.log(totalSum, folder)
+    if (Array.isArray(sysInfo.files)) {
+      sysInfo.files = sysInfo.files.reduce((a, b) => a + b)
+      totalSum.push(sysInfo.files)
+      index++
+      console.log("xxx", index, sysInfo.files)
+    } else {
+      totalSum[index] <= 100000 &&
+        (totalSum[index] += navigateAndSumFiles(
+          sysInfo[folder] as Folder,
+          totalSum,
+        ))
+
+      index--
+      navigateAndSumFiles(sysInfo[folder] as Folder, totalSum)
+      // totalSum[totalSum.length-1] += sum
+      console.log("---", folder, index, sysInfo.files)
+    }
+
+    // index++
   }
 
-  console.log("***", currentDir.files)
+  // console.log(totalSum)
+
+  return +sysInfo.files
 }
 
 type Folder = { [property: string]: number | number[] | Folder }
@@ -92,7 +114,10 @@ const part1 = (rawInput: string) => {
     }
   })
 
-  navigateAndSumFiles(sysInfo, stackPos)
+  const sum: number[] = []
+  navigateAndSumFiles(sysInfo, sum)
+
+  console.log(511011, sum)
 
   console.log("end Sys", JSON.stringify(sysInfo, undefined, 2))
 
