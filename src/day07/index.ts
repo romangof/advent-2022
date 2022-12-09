@@ -1,5 +1,4 @@
 import run from "aocrunner"
-import { type } from "os"
 
 const sampleInput = `$ cd /
 $ ls
@@ -24,116 +23,88 @@ dir y
 4060174 j
 8033020 d.log
 5626152 d.ext
-7214296 k
-$ cd y
-$ ls
-dir xxx
-$ cd xxx
-11112312 as
-33333333 asd.x`
+7214296 k`
+
+interface Folder {
+  name: string
+  size?: number
+  files?: number[]
+  subFolders?: Folder[]
+}
 
 const parseInput = (rawInput: string) =>
   rawInput.split("\n").map((line) => line.split(" "))
 
-const navigateAndAddDir = (
-  sysInfo: Record<string, {}>,
-  stackPos: string[],
-  newDir: string,
-) => {
-  // if (!stackPos.length) return
-  let currentDir = sysInfo
-
-  for (let prop of stackPos) {
-    currentDir = currentDir && currentDir[prop]
-  }
-
-  !currentDir[newDir] && (currentDir[newDir] = { files: [] })
-}
-
-const navigateAndAddFile = (
-  sysInfo: Record<string, {}>,
-  stackPos: string[],
-
-  fileSize: number,
-) => {
-  let currentDir = sysInfo
-
-  for (let prop of stackPos) {
-    currentDir = currentDir && (currentDir[prop] as Folder)
-  }
-
-  Array.isArray(currentDir.files) && currentDir.files.push(fileSize)
-}
-
-const navigateAndSumFiles = (
+const navigateAndAdd = (
   sysInfo: Folder,
-  totalSum: number[] = [],
-): number => {
-  // totalSum.length > 0 &&
-  //   (totalSum = [...totalSum, totalSum.reduce((a, b) => a + b)])
-  // console.log(totalSum)
+  stackPos: string[],
+  toAdd: Folder | number,
+) => {
+  let currentDir = sysInfo
 
-  let index = 0
-
-  for (let folder in sysInfo) {
-    if (!sysInfo.hasOwnProperty(folder)) continue
-
-    // console.log(totalSum, folder)
-    if (Array.isArray(sysInfo.files)) {
-      // sysInfo.files = sysInfo.files.reduce((a, b) => a + b, 0)
-      sysInfo.totalSize = sysInfo.files.reduce((a, b) => a + b, 0)
-      sysInfo.totalSize < 100000 && totalSum.push(sysInfo.totalSize)
-      index++
-      // console.log("xxx", index, sysInfo.files)
-    } else {
-      // totalSum[index] <= 100000 &&
-      totalSum[index] += navigateAndSumFiles(
-        sysInfo[folder] as Folder,
-        totalSum,
-      )
-
-      index--
-      navigateAndSumFiles(sysInfo[folder] as Folder, totalSum)
-      // totalSum[totalSum.length-1] += sum
-      // console.log("---", folder, index, sysInfo.files)
-    }
-
-    // index++
+  for (const currentFolder of stackPos) {
+    currentDir =
+      currentDir.subFolders?.find((folder) => folder.name === currentFolder) ||
+      currentDir
   }
 
-  // console.log(totalSum)
+  if (typeof toAdd === "number") {
+    return currentDir.files
+      ? currentDir.files?.push(toAdd)
+      : (currentDir.files = [toAdd])
+  }
 
-  return +sysInfo.files
+  currentDir.subFolders
+    ? currentDir.subFolders?.push(toAdd)
+    : (currentDir.subFolders = [toAdd])
 }
 
-type Folder = { [property: string]: number | number[] | Folder }
+const calcFolderSize = (folder: Folder): number => {
+  folder.size = folder.files?.reduce((a, b) => a + b, 0) || 0
+
+  if (folder.subFolders?.length) {
+    return (folder.size += folder.subFolders.reduce(
+      (accum, current) => accum + calcFolderSize(current),
+      0,
+    ))
+  }
+
+  return folder.size
+}
+
+const navigateAndSumFiles = (folder: Folder, accumulator: number[]) => {
+  folder.size && folder.size <= 100000 && accumulator.push(folder.size)
+
+  if (folder.subFolders?.length) {
+    folder.subFolders.map((subFolder) =>
+      navigateAndSumFiles(subFolder, accumulator),
+    )
+  }
+}
 
 const part1 = (rawInput: string) => {
   const input = parseInput(rawInput)
   const stackPos: string[] = []
-  const sysInfo: Folder = { "/": { files: [] } }
+  const sysInfo: Folder = { name: "/" }
+  const sum: number[] = []
 
   input.map((line) => {
     if (line[0] === "$" && line[2]) {
       line[2] === ".." ? stackPos.pop() : stackPos.push(line[2])
     } else if (line[0] === "dir") {
-      navigateAndAddDir(sysInfo, stackPos, line[1])
+      navigateAndAdd(sysInfo, stackPos, { name: line[1] })
     } else if (Number(line[0])) {
-      navigateAndAddFile(sysInfo, stackPos, Number(line[0]))
+      navigateAndAdd(sysInfo, stackPos, Number(line[0]))
     }
   })
 
+  calcFolderSize(sysInfo)
+  navigateAndSumFiles(sysInfo, sum)
   console.log("end Sys", JSON.stringify(sysInfo, undefined, 2))
 
-  const sum: number[] = []
+  console.log(sum)
 
-  navigateAndSumFiles(sysInfo, sum)
-
-  // console.log("*****", sum)
-
-  // console.log(sum.filter((x) => x <= 100000))
-
-  return sum.filter((x) => x <= 100000).reduce((a, b) => a + b, 0)
+  return sum.reduce((a, b) => a + b)
 }
 
 const part2 = (rawInput: string) => {
@@ -162,5 +133,5 @@ run({
     solution: part2,
   },
   trimTestInputs: true,
-  onlyTests: true,
+  onlyTests: false,
 })
