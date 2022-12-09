@@ -20,10 +20,17 @@ $ cd ..
 $ cd ..
 $ cd d
 $ ls
+dir y
 4060174 j
 8033020 d.log
 5626152 d.ext
-7214296 k`
+7214296 k
+$ cd y
+$ ls
+dir xxx
+$ cd xxx
+11112312 as
+33333333 asd.x`
 
 const parseInput = (rawInput: string) =>
   rawInput.split("\n").map((line) => line.split(" "))
@@ -46,6 +53,7 @@ const navigateAndAddDir = (
 const navigateAndAddFile = (
   sysInfo: Record<string, {}>,
   stackPos: string[],
+
   fileSize: number,
 ) => {
   let currentDir = sysInfo
@@ -66,26 +74,28 @@ const navigateAndSumFiles = (
   // console.log(totalSum)
 
   let index = 0
+
   for (let folder in sysInfo) {
     if (!sysInfo.hasOwnProperty(folder)) continue
 
-    console.log(totalSum, folder)
+    // console.log(totalSum, folder)
     if (Array.isArray(sysInfo.files)) {
-      sysInfo.files = sysInfo.files.reduce((a, b) => a + b)
-      totalSum.push(sysInfo.files)
+      // sysInfo.files = sysInfo.files.reduce((a, b) => a + b, 0)
+      sysInfo.totalSize = sysInfo.files.reduce((a, b) => a + b, 0)
+      sysInfo.totalSize < 100000 && totalSum.push(sysInfo.totalSize)
       index++
-      console.log("xxx", index, sysInfo.files)
+      // console.log("xxx", index, sysInfo.files)
     } else {
-      totalSum[index] <= 100000 &&
-        (totalSum[index] += navigateAndSumFiles(
-          sysInfo[folder] as Folder,
-          totalSum,
-        ))
+      // totalSum[index] <= 100000 &&
+      totalSum[index] += navigateAndSumFiles(
+        sysInfo[folder] as Folder,
+        totalSum,
+      )
 
       index--
       navigateAndSumFiles(sysInfo[folder] as Folder, totalSum)
       // totalSum[totalSum.length-1] += sum
-      console.log("---", folder, index, sysInfo.files)
+      // console.log("---", folder, index, sysInfo.files)
     }
 
     // index++
@@ -100,7 +110,6 @@ type Folder = { [property: string]: number | number[] | Folder }
 
 const part1 = (rawInput: string) => {
   const input = parseInput(rawInput)
-  const maxDirSize = 100000
   const stackPos: string[] = []
   const sysInfo: Folder = { "/": { files: [] } }
 
@@ -114,14 +123,17 @@ const part1 = (rawInput: string) => {
     }
   })
 
-  const sum: number[] = []
-  navigateAndSumFiles(sysInfo, sum)
-
-  console.log(511011, sum)
-
   console.log("end Sys", JSON.stringify(sysInfo, undefined, 2))
 
-  return
+  const sum: number[] = []
+
+  navigateAndSumFiles(sysInfo, sum)
+
+  // console.log("*****", sum)
+
+  // console.log(sum.filter((x) => x <= 100000))
+
+  return sum.filter((x) => x <= 100000).reduce((a, b) => a + b, 0)
 }
 
 const part2 = (rawInput: string) => {
