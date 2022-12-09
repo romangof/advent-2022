@@ -106,13 +106,13 @@
           "1115963",
           "46097207"
         ],
-        "time": 4.011417
+        "time": 0.932125
       },
       "part2": {
-        "solved": false,
-        "result": null,
+        "solved": true,
+        "result": "366028",
         "attempts": [],
-        "time": null
+        "time": 1.169458
       }
     },
     {

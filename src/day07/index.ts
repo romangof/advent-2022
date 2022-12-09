@@ -72,12 +72,16 @@ const calcFolderSize = (folder: Folder): number => {
   return folder.size
 }
 
-const navigateAndSumFiles = (folder: Folder, accumulator: number[]) => {
-  folder.size && folder.size <= 100000 && accumulator.push(folder.size)
+const navigateAndPushSizes = (
+  folder: Folder,
+  accumulator: number[],
+  condition: (x: number) => boolean = (a) => a <= 100000,
+) => {
+  folder.size && condition(folder.size) && accumulator.push(folder.size)
 
   if (folder.subFolders?.length) {
     folder.subFolders.map((subFolder) =>
-      navigateAndSumFiles(subFolder, accumulator),
+      navigateAndPushSizes(subFolder, accumulator, condition),
     )
   }
 }
@@ -99,18 +103,41 @@ const part1 = (rawInput: string) => {
   })
 
   calcFolderSize(sysInfo)
-  navigateAndSumFiles(sysInfo, sum)
-  console.log("end Sys", JSON.stringify(sysInfo, undefined, 2))
-
-  console.log(sum)
+  navigateAndPushSizes(sysInfo, sum)
+  // console.log("end Sys", JSON.stringify(sysInfo, undefined, 2))
 
   return sum.reduce((a, b) => a + b)
 }
 
 const part2 = (rawInput: string) => {
   const input = parseInput(rawInput)
+  const stackPos: string[] = []
+  const sysInfo: Folder = { name: "/" }
+  const sum: number[] = []
 
-  return
+  const capacity = 70000000
+  const needed = 30000000
+
+  input.map((line) => {
+    if (line[0] === "$" && line[2]) {
+      line[2] === ".." ? stackPos.pop() : stackPos.push(line[2])
+    } else if (line[0] === "dir") {
+      navigateAndAdd(sysInfo, stackPos, { name: line[1] })
+    } else if (Number(line[0])) {
+      navigateAndAdd(sysInfo, stackPos, Number(line[0]))
+    }
+  })
+
+  calcFolderSize(sysInfo)
+
+  const minSize =
+    sysInfo.size && sysInfo.size >= capacity - needed
+      ? needed - (capacity - sysInfo.size)
+      : 0
+
+  navigateAndPushSizes(sysInfo, sum, (size) => size >= minSize)
+
+  return sum.sort((a, b) => a - b)[0]
 }
 
 run({
@@ -127,7 +154,7 @@ run({
     tests: [
       {
         input: sampleInput,
-        expected: "",
+        expected: 24933642,
       },
     ],
     solution: part2,
