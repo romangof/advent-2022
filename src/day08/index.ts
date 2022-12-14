@@ -48,9 +48,60 @@ const part1 = (rawInput: string) => {
 }
 
 const part2 = (rawInput: string) => {
-  const input = parseInput(rawInput)
+  const input = parseInput(rawInput).map((treeline) =>
+    treeline.split("").map((tree) => Number(tree)),
+  )
 
-  return
+  let highestScore = 0
+
+  for (let yIndex = 1; yIndex < input.length - 1; yIndex++) {
+    const treeLine = input[yIndex]
+
+    for (let xIndex = 1; xIndex < treeLine.length - 1; xIndex++) {
+      const tree = treeLine[xIndex]
+      const score: [number, number, number, number] = [0, 0, 0, 0]
+
+      const subArrays: Record<string, number[]> = {
+        left: treeLine.slice(0, xIndex),
+        top: [],
+        right: treeLine.slice(xIndex + 1),
+        bottom: [],
+      }
+
+      for (let yyIndex = 0; yyIndex < yIndex; yyIndex++) {
+        subArrays.top.push(input[yyIndex][xIndex])
+      }
+      for (let yyIndex = yIndex + 1; yyIndex < input.length; yyIndex++) {
+        subArrays.bottom.push(input[yyIndex][xIndex])
+      }
+
+      subArrays.left.reverse().find((x) => {
+        score[0]++
+        return tree <= x
+      })
+
+      subArrays.top.reverse().find((x) => {
+        score[1]++
+        return tree <= x
+      })
+
+      subArrays.right.find((x) => {
+        score[2]++
+        return tree <= x
+      })
+
+      subArrays.bottom.find((x) => {
+        score[3]++
+        return tree <= x
+      })
+
+      const currentTreeScore = score.reduce((a, b) => a * b)
+
+      currentTreeScore > highestScore && (highestScore = currentTreeScore)
+    }
+  }
+
+  return highestScore
 }
 
 run({
@@ -67,7 +118,7 @@ run({
     tests: [
       {
         input: sampleInput,
-        expected: "",
+        expected: 8,
       },
     ],
     solution: part2,
